@@ -40,6 +40,7 @@ app.set('view engine', 'ejs');
 //using the express urlencoded to parse the req.body
 app.use(express.urlencoded({ extended: true }));
 //using the method override middleware and setting the string I want to use
+//method used to send the PUT/DELETE requests
 app.use(methodOverride('_method'));
 
 

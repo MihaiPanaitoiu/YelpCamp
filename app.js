@@ -7,7 +7,8 @@ const mongoose = require('mongoose');
 //requiring our model that we exported
 const Campground = require('./models/campground');
 // const campground = require('./models/campground');
-// const methodOverride = require('method-override');
+//requiring method override middleware
+const methodOverride = require('method-override');
 
 // const Product = require('./models/product');
 
@@ -16,8 +17,11 @@ mongoose.connect('mongodb://localhost:27017/yelp-camp',
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        useCreateIndex: true
-    })
+        useCreateIndex: true,
+        useFindAndModify: false
+    });
+
+// mongoose.set('useFindAndModify', false);
 
 //adding logic to check if there is an error
 const db = mongoose.connection;
@@ -34,8 +38,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 //using the express urlencoded to parse the req.body
-app.use(express.urlencoded({ extended: true }))
-// app.use(methodOverride('_method'));
+app.use(express.urlencoded({ extended: true }));
+//using the method override middleware and setting the string I want to use
+app.use(methodOverride('_method'));
 
 
 //home route get
@@ -67,7 +72,20 @@ app.get('/campgrounds/:id', async (req, res) => {
     res.render('campgrounds/show', { campground })
 });
 
+//route to get the edit form
+app.get('/campgrounds/:id/edit', async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    res.render('campgrounds/edit', { campground })
+});
 
+//PUT request to send the data from the edit form
+app.put('/campgrounds/:id', async (req, res) => {
+    const { id } = req.params;
+    //finding by id and updating the campground. Using the spread method to get the title
+    // and location which we sent them both in the [campground] in name in the form
+    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
+    res.redirect(`/campgrounds/${campground._id}`)
+});
 
 
 //listening to port 3000

@@ -5,7 +5,8 @@ const path = require('path');
 //requiring mongoose
 const mongoose = require('mongoose');
 //requiring our model that we exported
-const Campground = require('./models/campground')
+const Campground = require('./models/campground');
+const campground = require('./models/campground');
 // const methodOverride = require('method-override');
 
 // const Product = require('./models/product');
@@ -23,7 +24,7 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
     console.log('Database connected')
-})
+});
 
 //executing express    
 const app = express();
@@ -39,21 +40,26 @@ app.set('view engine', 'ejs');
 //home route get
 app.get('/', (req, res) => {
     res.render('home')
-})
+});
 
-//making and saving new campgrund
-app.get('/makecampground', async (req, res) => {
-    const camp = new Campground({ title: 'My backyard', description: 'Cheap camping' });
-    await camp.save();
-    res.send(camp)
-})
+//basic index route
+app.get('/campgrounds', async (req, res) => {
+    const campgrounds = await Campground.find({});
+    res.render('campgrounds/index', { campgrounds })
+});
 
+//show route
+app.get('/campgrounds/:id', async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    res.render('campgrounds/show', { campground })
+});
 
+app.get('/campgrounds/new', (req, res) => {
+    res.render('campgrounds/new')
+});
 
 
 //listening to port 3000
 app.listen(3000, () => {
     console.log('SERVING ON PORT 3000')
-})
-
-//this is a test push from the staging branch
+});

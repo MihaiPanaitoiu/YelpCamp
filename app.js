@@ -88,6 +88,13 @@ app.put('/campgrounds/:id', async (req, res) => {
     res.redirect(`/campgrounds/${campground._id}`)
 });
 
+//DELETE REQUEST
+app.delete('/campgrounds/:id', async (req, res) => {
+    const { id } = req.params;
+    await Campground.findByIdAndDelete(id);
+    res.redirect('/campgrounds')
+})
+
 
 //listening to port 3000
 app.listen(3000, () => {

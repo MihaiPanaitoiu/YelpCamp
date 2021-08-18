@@ -50,7 +50,7 @@ app.use(methodOverride('_method'));
 
 //home route get
 app.get('/', (req, res) => {
-    res.redirect('/campgrounds')
+    res.render('home')
 });
 
 //basic index route

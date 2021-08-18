@@ -4,6 +4,8 @@ const express = require('express');
 const path = require('path');
 //requiring mongoose
 const mongoose = require('mongoose');
+//requiring ejs-mate
+const ejsMate = require('ejs-mate');
 //requiring our model that we exported
 const Campground = require('./models/campground');
 // const campground = require('./models/campground');
@@ -33,6 +35,8 @@ db.once('open', () => {
 //executing express    
 const app = express();
 
+//telling express this is the ejs engine we want to use
+app.engine('ejs', ejsMate);
 //setting view engine to ejs and setting the path to the view folder
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -46,7 +50,7 @@ app.use(methodOverride('_method'));
 
 //home route get
 app.get('/', (req, res) => {
-    res.render('home')
+    res.redirect('/campgrounds')
 });
 
 //basic index route

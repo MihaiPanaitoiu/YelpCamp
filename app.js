@@ -6,6 +6,11 @@ const path = require('path');
 const mongoose = require('mongoose');
 //requiring ejs-mate
 const ejsMate = require('ejs-mate');
+const { campgroundSchema } = require('./schemas.js')
+//requiring our Async ulitily
+const catchAsync = require('./utils/catchAsync');
+//requiring our custom ExpressError
+const ExpressError = require('./utils/ExpressError')
 //requiring our model that we exported
 const Campground = require('./models/campground');
 // const campground = require('./models/campground');
@@ -55,7 +60,7 @@ app.get('/', (req, res) => {
 
 //basic index route
 app.get('/campgrounds', async (req, res) => {
-    const campgrounds = await Campground.find({});
+    const campgrounds = await Campground.find({ });
     res.render('campgrounds/index', { campgrounds })
 });
 
@@ -65,11 +70,12 @@ app.get('/campgrounds/new', (req, res) => {
 });
 
 //post request to send the data from the form
-app.post('/campgrounds', async (req, res) => {
+app.post('/campgrounds', catchAsync(async (req, res, next) => {
+    if (!req.body.campground) throw new ExpressError('Invalid Campground data', 500)
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
-})
+}))
 
 //show route
 app.get('/campgrounds/:id', async (req, res) => {
@@ -84,19 +90,26 @@ app.get('/campgrounds/:id/edit', async (req, res) => {
 });
 
 //PUT request to send the data from the edit form
-app.put('/campgrounds/:id', async (req, res) => {
+app.put('/campgrounds/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     //finding by id and updating the campground. Using the spread method to get the title
     // and location which we sent them both in the [campground] in name in the form
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     res.redirect(`/campgrounds/${campground._id}`)
-});
+}));
 
 //DELETE REQUEST
 app.delete('/campgrounds/:id', async (req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds')
+})
+
+//error handler
+app.use((err, req, res, next) => {
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = 'Oh no! something went wrong'
+    res.status(statusCode).render('error', { err });
 })
 
 

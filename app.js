@@ -6,6 +6,9 @@ const path = require('path');
 const mongoose = require('mongoose');
 //requiring ejs-mate
 const ejsMate = require('ejs-mate');
+//requiring joi validation middleware
+const Joi = require('joi');
+//requiring our Joi validation schema
 const { campgroundSchema } = require('./schemas.js')
 //requiring our Async ulitily
 const catchAsync = require('./utils/catchAsync');
@@ -16,6 +19,7 @@ const Campground = require('./models/campground');
 // const campground = require('./models/campground');
 //requiring method override middleware
 const methodOverride = require('method-override');
+const { validate } = require('./models/campground');
 
 // const Product = require('./models/product');
 
@@ -52,6 +56,18 @@ app.use(express.urlencoded({ extended: true }));
 //method used to send the PUT/DELETE requests
 app.use(methodOverride('_method'));
 
+const validateCampground = (req, res, nexy) => {
+    //defining our campgroundSchema, that will validate the data before sending it to mongoose
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
+
+
 
 //home route get
 app.get('/', (req, res) => {
@@ -59,10 +75,10 @@ app.get('/', (req, res) => {
 });
 
 //basic index route
-app.get('/campgrounds', async (req, res) => {
-    const campgrounds = await Campground.find({ });
+app.get('/campgrounds', catchAsync(async (req, res) => {
+    const campgrounds = await Campground.find({});
     res.render('campgrounds/index', { campgrounds })
-});
+}));
 
 //route to get the form to add a new campground
 app.get('/campgrounds/new', (req, res) => {
@@ -70,27 +86,27 @@ app.get('/campgrounds/new', (req, res) => {
 });
 
 //post request to send the data from the form
-app.post('/campgrounds', catchAsync(async (req, res, next) => {
-    if (!req.body.campground) throw new ExpressError('Invalid Campground data', 500)
+app.post('/campgrounds', validateCampground, catchAsync(async (req, res, next) => {
+    // if (!req.body.campground) throw new ExpressError('Invalid Campground data', 500)
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
 //show route
-app.get('/campgrounds/:id', async (req, res) => {
+app.get('/campgrounds/:id', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     res.render('campgrounds/show', { campground })
-});
+}));
 
 //route to get the edit form
-app.get('/campgrounds/:id/edit', async (req, res) => {
+app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     res.render('campgrounds/edit', { campground })
-});
+}));
 
 //PUT request to send the data from the edit form
-app.put('/campgrounds/:id', catchAsync(async (req, res) => {
+app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
     const { id } = req.params;
     //finding by id and updating the campground. Using the spread method to get the title
     // and location which we sent them both in the [campground] in name in the form
@@ -99,11 +115,15 @@ app.put('/campgrounds/:id', catchAsync(async (req, res) => {
 }));
 
 //DELETE REQUEST
-app.delete('/campgrounds/:id', async (req, res) => {
+app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds')
-})
+}));
+
+// app.all('*', (req, res, next)) => {
+//     next(new ExpressError('Page not found', 404))
+// }
 
 //error handler
 app.use((err, req, res, next) => {

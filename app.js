@@ -143,6 +143,14 @@ app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res)
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
+//delete route for reviews. Delete the reviews and the object id from the reviews array
+app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (req, res) => {
+    const {id, reviewId} = req.params
+    await Campground.findByIdAndUpdate(id, {$pull: {reviews:reviewId}})
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`)
+}))
+
 // app.all('*', (req, res, next)) => {
 //     next(new ExpressError('Page not found', 404))
 // }

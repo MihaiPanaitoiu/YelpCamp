@@ -9,7 +9,7 @@ const ejsMate = require('ejs-mate');
 //requiring joi validation middleware
 const Joi = require('joi');
 //requiring our Joi validation schema
-const { campgroundSchema } = require('./schemas.js')
+const { campgroundSchema, reviewSchema } = require('./schemas.js')
 //requiring our Async ulitily
 const catchAsync = require('./utils/catchAsync');
 //requiring our custom ExpressError
@@ -57,10 +57,20 @@ app.use(express.urlencoded({ extended: true }));
 //method used to send the PUT/DELETE requests
 app.use(methodOverride('_method'));
 
-const validateCampground = (req, res, nexy) => {
+const validateCampground = (req, res, next) => {
     //defining our campgroundSchema, that will validate the data before sending it to mongoose
     const { error } = campgroundSchema.validate(req.body);
     if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
+
+const validateReview = (req, res, next) => {
+    const {error} = reviewSchema.validate(req.body);
+    if(error) {
         const msg = error.details.map(el => el.message).join(',')
         throw new ExpressError(msg, 400)
     } else {
@@ -123,7 +133,7 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
 }));
 
 //POST review route
-app.post('/campgrounds/:id/reviews', catchAsync(async (req, res) => {
+app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
     const {id} = req.params
     const campground = await Campground.findById(id)
     const review = new Review(req.body.review)

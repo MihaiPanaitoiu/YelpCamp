@@ -1,5 +1,7 @@
 //require mongoose
 const mongoose = require('mongoose');
+const {campgroundSchema} = require("../schemas");
+const Review = require('./review')
 
 //adding shortcut for mongoose.Schema
 const Schema = mongoose.Schema;
@@ -17,6 +19,13 @@ const CampgroundSchema = new Schema({
             ref: "Review"
         }
     ]
+})
+
+CampgroundSchema.post('findOneAndDelete', async function(doc) {
+    if (doc) {
+       const res = await Review.deleteMany({_id: {$in:doc.reviews}})
+        console.log(res)
+    }
 })
 
 //exporting our Campground model

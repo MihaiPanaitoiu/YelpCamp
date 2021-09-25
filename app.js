@@ -16,7 +16,8 @@ const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError')
 //requiring our model that we exported
 const Campground = require('./models/campground');
-// const campground = require('./models/campground');
+//requiring reviews model
+const Review = require('./models/review');
 //requiring method override middleware
 const methodOverride = require('method-override');
 const { validate } = require('./models/campground');
@@ -120,6 +121,17 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds')
 }));
+
+//POST review route
+app.post('/campgrounds/:id/reviews', catchAsync(async (req, res) => {
+    const {id} = req.params
+    const campground = await Campground.findById(id)
+    const review = new Review(req.body.review)
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`)
+}))
 
 // app.all('*', (req, res, next)) => {
 //     next(new ExpressError('Page not found', 404))

@@ -5,6 +5,8 @@ const router  = express.Router();
 //requiring our custom ExpressError
 const ExpressError = require('../utils/ExpressError')
 const {campgroundSchema} = require("../schemas.js");
+const {isLoggedIn} = require('../middleware');
+
 
 const validateCampground = (req, res, next) => {
     //defining our campgroundSchema, that will validate the data before sending it to mongoose
@@ -17,6 +19,7 @@ const validateCampground = (req, res, next) => {
     }
 }
 
+
 //basic index route
 router.get('/', catchAsync(async (req, res) => {
     const campgrounds = await Campground.find({});
@@ -24,12 +27,12 @@ router.get('/', catchAsync(async (req, res) => {
 }));
 
 //route to get the form to add a new campground
-router.get('/new', (req, res) => {
+router.get('/new', isLoggedIn, (req, res) => {
     res.render('campgrounds/new')
 });
 
 //post request to send the data from the form. creating a new campground
-router.post('/', validateCampground, catchAsync(async (req, res, next) => {
+router.post('/', isLoggedIn, catchAsync(async (req, res, next) => {
     // if (!req.body.campground) throw new ExpressError('Invalid Campground data', 500)
     const campground = new Campground(req.body.campground);
     await campground.save();
@@ -48,7 +51,7 @@ router.get('/:id', catchAsync(async (req, res) => {
 }));
 
 //route to get the edit form
-router.get('/:id/edit', catchAsync(async (req, res) => {
+router.get('/:id/edit',isLoggedIn, catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     if(!campground) {
         req.flash('error', 'Cannot find the campground');
@@ -58,7 +61,7 @@ router.get('/:id/edit', catchAsync(async (req, res) => {
 }));
 
 //PUT request to send the data from the edit form
-router.put('/:id', validateCampground, catchAsync(async (req, res) => {
+router.put('/:id',isLoggedIn, validateCampground, catchAsync(async (req, res) => {
     const { id } = req.params;
     //finding by id and updating the campground. Using the spread method to get the title
     // and location which we sent them both in the [campground] in name in the form
@@ -68,7 +71,7 @@ router.put('/:id', validateCampground, catchAsync(async (req, res) => {
 }));
 
 //DELETE REQUEST
-router.delete('/:id', catchAsync(async (req, res) => {
+router.delete('/:id',isLoggedIn, catchAsync(async (req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     req.flash('success', 'Successfully deleted the campground');

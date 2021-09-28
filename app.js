@@ -57,6 +57,7 @@ app.use(express.urlencoded({ extended: true }));
 //using the method override middleware and setting the string I want to use
 //method used to send the PUT/DELETE requests
 app.use(methodOverride('_method'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/campgrounds', campgrounds);
 app.use('/campgrounds/:id/reviews', reviews);

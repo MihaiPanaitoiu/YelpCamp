@@ -8,6 +8,8 @@ const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
 //requiring express session
 const session = require('express-session');
+//requiring flash
+const flash = require('connect-flash');
 //requiring our custom ExpressError
 const ExpressError = require('./utils/ExpressError');
 //requiring method override middleware
@@ -63,6 +65,14 @@ const sessionConfig = {
     }
 }
 app.use(session(sessionConfig));
+
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+})
 
 //using our routers
 app.use('/campgrounds', campgrounds);

@@ -28,11 +28,12 @@ router.get('/new', (req, res) => {
     res.render('campgrounds/new')
 });
 
-//post request to send the data from the form
+//post request to send the data from the form. creating a new campground
 router.post('/', validateCampground, catchAsync(async (req, res, next) => {
     // if (!req.body.campground) throw new ExpressError('Invalid Campground data', 500)
     const campground = new Campground(req.body.campground);
     await campground.save();
+    req.flash('success', 'Successfully made a new campground!');
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 

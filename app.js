@@ -6,22 +6,13 @@ const path = require('path');
 const mongoose = require('mongoose');
 //requiring ejs-mate
 const ejsMate = require('ejs-mate');
-// //requiring joi validation middleware
-// const Joi = require('joi');
-// //requiring our Joi validation schema
-// const { campgroundSchema, reviewSchema } = require('./schemas.js')
-// //requiring our Async ulitily
-// const catchAsync = require('./utils/catchAsync');
+//requiring express session
+const session = require('express-session');
 //requiring our custom ExpressError
-const ExpressError = require('./utils/ExpressError')
-// //requiring our model that we exported
-// const Campground = require('./models/campground');
-// //requiring reviews model
-// const Review = require('./models/review');
+const ExpressError = require('./utils/ExpressError');
 //requiring method override middleware
 const methodOverride = require('method-override');
-// const { validate } = require('./models/campground');
-
+//requiring our files where we set the routers
 const campgrounds = require('./routes/campgrounds');
 const reviews = require('./routes/reviews');
 
@@ -57,8 +48,23 @@ app.use(express.urlencoded({ extended: true }));
 //using the method override middleware and setting the string I want to use
 //method used to send the PUT/DELETE requests
 app.use(methodOverride('_method'));
+//using public folder to serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+//using session and configuring it
+const sessionConfig = {
+    secret: 'thisshouldbeabettersecret!',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
+app.use(session(sessionConfig));
+
+//using our routers
 app.use('/campgrounds', campgrounds);
 app.use('/campgrounds/:id/reviews', reviews);
 

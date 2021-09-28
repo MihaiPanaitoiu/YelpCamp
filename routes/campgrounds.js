@@ -55,6 +55,7 @@ router.put('/:id', validateCampground, catchAsync(async (req, res) => {
     //finding by id and updating the campground. Using the spread method to get the title
     // and location which we sent them both in the [campground] in name in the form
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
+    req.flash('success', 'Successfully updated campground');
     res.redirect(`/campgrounds/${campground._id}`)
 }));
 
@@ -62,6 +63,7 @@ router.put('/:id', validateCampground, catchAsync(async (req, res) => {
 router.delete('/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
+    req.flash('success', 'Successfully deleted the campground');
     res.redirect('/campgrounds')
 }));
 

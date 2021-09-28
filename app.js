@@ -19,9 +19,10 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 
-
-const campgrounds = require('./routes/campgrounds');
-const reviews = require('./routes/reviews');
+//requiring routers files
+const campgroundRoutes = require('./routes/campgrounds');
+const reviewRoutes = require('./routes/reviews');
+const userRoutes = require('./routes/users');
 
 
 //connecting mongoose
@@ -86,8 +87,9 @@ app.use((req, res, next) => {
 })
 
 //using our routers
-app.use('/campgrounds', campgrounds);
-app.use('/campgrounds/:id/reviews', reviews);
+app.use('/campgrounds', campgroundRoutes);
+app.use('/campgrounds/:id/reviews', reviewRoutes);
+app.use('/', userRoutes);
 
 
 //home route get

@@ -29,12 +29,13 @@ const seedDB = async () => {
     //deleting everything in the database
     await Campground.deleteMany({});
     //looping over seeds files and getting 50 new entries in the db
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 10; i++) {
         //generate random number from 1 to 1000
         const random1000 = Math.floor(Math.random() * 1000);
         const price = Math.floor(Math.random() * 20) + 10;
         //creating a new campground each time this is looped
         const camp = new Campground({
+            author: '615431a8727ef94dde4b7910',
             //adding a location from cities.js
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
             //adding a title from seedHelpers.js

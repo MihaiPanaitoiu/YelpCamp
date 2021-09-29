@@ -52,10 +52,15 @@ router.get('/:id', catchAsync(async (req, res) => {
 
 //route to get the edit form
 router.get('/:id/edit',isLoggedIn, catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
+    const { id } = req.params;
+    const campground = await Campground.findById(id);
     if(!campground) {
         req.flash('error', 'Cannot find the campground');
         res.redirect('/campgrounds');
+    }
+    if (!campground.author.equals(req.user._id)) {
+        req.flash('error', 'You do not have permission to do that');
+        return res.redirect(`/campgrounds/${id}`);
     }
     res.render('campgrounds/edit', { campground })
 }));
@@ -63,16 +68,24 @@ router.get('/:id/edit',isLoggedIn, catchAsync(async (req, res) => {
 //PUT request to send the data from the edit form
 router.put('/:id',isLoggedIn, validateCampground, catchAsync(async (req, res) => {
     const { id } = req.params;
-    //finding by id and updating the campground. Using the spread method to get the title
-    // and location which we sent them both in the [campground] in name in the form
-    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
+    const campground = await Campground.findById(id);
+    if (!campground.author.equals(req.user._id)) {
+        req.flash('error', 'You do not have permission to do that');
+        return res.redirect(`/campgrounds/${id}`);
+    }
+    const camp = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     req.flash('success', 'Successfully updated campground');
-    res.redirect(`/campgrounds/${campground._id}`)
+    res.redirect(`/campgrounds/${camp._id}`)
 }));
 
 //DELETE REQUEST
 router.delete('/:id',isLoggedIn, catchAsync(async (req, res) => {
     const { id } = req.params;
+    const campground = await Campground.findById(id);
+    if (!campground.author.equals(req.user._id)) {
+        req.flash('error', 'You do not have permission to do that');
+        return res.redirect(`/campgrounds/${id}`);
+    }
     await Campground.findByIdAndDelete(id);
     req.flash('success', 'Successfully deleted the campground');
     res.redirect('/campgrounds')

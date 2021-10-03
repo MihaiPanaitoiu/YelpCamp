@@ -4,7 +4,7 @@
         <h1 class="text-center">New Campground</h1>
         <div class="col-6 offset-3">
             <!--  Adding novalidate to the form and required to all fields so bootstrap can take over validation-->
-            <form action="/campgrounds" method="POST" novalidate class="validated-form">
+            <form action="/campgrounds" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label" for="title">Title</label>
                     <!-- grouping everything under campground to have it sent under the campground -->
@@ -20,13 +20,14 @@
                         Looks Good!
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label" for="image">Image URL</label>
-                    <input class="form-control" type="text" id="image" name="campground[image]" required>
-                    <div class="valid-feedback">
-                        Looks Good!
-                    </div>
-                </div>
+                <input type="file" name="image" id="" multiple>
+<!--                <div class="mb-3">-->
+<!--                    <label class="form-label" for="image">Image URL</label>-->
+<!--                    <input class="form-control" type="text" id="image" name="campground[image]" required>-->
+<!--                    <div class="valid-feedback">-->
+<!--                        Looks Good!-->
+<!--                    </div>-->
+<!--                </div>-->
                 <div class="mb-3">
                     <label class="form-label" for="price">Price</label>
                     <div class="input-group">

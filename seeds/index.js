@@ -35,11 +35,16 @@ const seedDB = async () => {
         const price = Math.floor(Math.random() * 20) + 10;
         //creating a new campground each time this is looped
         const camp = new Campground({
+            //MY USER ID
             author: '615431a8727ef94dde4b7910',
             //adding a location from cities.js
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
             //adding a title from seedHelpers.js
             title: `${sample(descriptors)} ${sample(places)}`,
+            geometry: {
+                "type":"Point",
+                "coordinates":[-117.1730567,34.2756023]
+            },
             images: [
                 {
                     url: 'https://res.cloudinary.com/dw8yq6bns/image/upload/v1633276351/YelpCamp/azwols24xfb14m1vnwbg.jpg',

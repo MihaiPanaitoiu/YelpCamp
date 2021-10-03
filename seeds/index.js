@@ -29,7 +29,7 @@ const seedDB = async () => {
     //deleting everything in the database
     await Campground.deleteMany({});
     //looping over seeds files and getting 50 new entries in the db
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 200; i++) {
         //generate random number from 1 to 1000
         const random1000 = Math.floor(Math.random() * 1000);
         const price = Math.floor(Math.random() * 20) + 10;
@@ -43,7 +43,10 @@ const seedDB = async () => {
             title: `${sample(descriptors)} ${sample(places)}`,
             geometry: {
                 "type":"Point",
-                "coordinates":[-117.1730567,34.2756023]
+                "coordinates":[
+                    cities[random1000].longitude,
+                    cities[random1000].latitude
+                ]
             },
             images: [
                 {

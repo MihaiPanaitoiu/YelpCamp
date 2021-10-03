@@ -6,7 +6,6 @@
     <div class="row">
         <div class="col-6">
 
-            <div id='map' style='width: 400px; height: 300px;'></div>
 
 
             <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
@@ -66,6 +65,10 @@
         </div>
 
         <div class="col-6">
+            <div class="mb-3 ">
+            <div id='map'></div>
+            </div>
+
             <% if(currentUser) { %>
             <h2>Leave a review</h2>
             <form action="/campgrounds/<%=campground._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate>
@@ -75,7 +78,7 @@
                 <!--                </div>-->
                 <div class="mb-3 ">
                     <fieldset class="starability-coinFlip">
-                        <legend>First rating:</legend>
+<!--                        <legend>First rating:</legend>-->
                         <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="5" checked aria-label="No rating." />
                         <input type="radio" id="first-rate1" name="review[rating]" value="1" />
                         <label for="first-rate1" title="Terrible">1 star</label>

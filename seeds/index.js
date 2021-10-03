@@ -42,8 +42,8 @@ const seedDB = async () => {
             title: `${sample(descriptors)} ${sample(places)}`,
             images: [
                 {
-                    url: 'https://res.cloudinary.com/dw8yq6bns/image/upload/v1633272138/YelpCamp/pbvx8mapbsukqf2q19gb.jpg',
-                    filename: 'YelpCamp/pbvx8mapbsukqf2q19gb'
+                    url: 'https://res.cloudinary.com/dw8yq6bns/image/upload/v1633276351/YelpCamp/azwols24xfb14m1vnwbg.jpg',
+                    filename: 'YelpCamp/azwols24xfb14m1vnwbg'
                 }
             ],
             description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum',

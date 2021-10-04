@@ -22,17 +22,22 @@ const methodOverride = require('method-override');
 //requiring our files where we set the routers
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const mongoSanitize = require('express-mongo-sanitize');
 const User = require('./models/user');
+const helmet = require('helmet');
 
 //requiring routers files
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
 
+const MongoStore = require("connect-mongo");
 
+// const dbUrl = process.env.DB_URL
+const dbUrl = 'mongodb://localhost:27017/yelp-camp'
 //connecting mongoose
-mongoose.connect('mongodb://localhost:27017/yelp-camp',
-    {
+mongoose.connect(dbUrl,
+{
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
@@ -64,19 +69,40 @@ app.use(methodOverride('_method'));
 //using public folder to serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(mongoSanitize({
+    replaceWith: '_'
+}));
+
+
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret: 'thisshouldbeabettersecret'
+    }
+})
+
+store.on("error", function (e) {
+    console.log('Session Error', e)
+})
+
 //using session and configuring it
 const sessionConfig = {
+    store,
+    name: 'session',
     secret: 'thisshouldbeabettersecret!',
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
+        // secure: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }
 app.use(session(sessionConfig));
 app.use(flash());
+app.use(helmet({contentSecurityPolicy: false}));
 
 app.use(passport.initialize());
 app.use(passport.session());
